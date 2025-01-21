@@ -1,0 +1,57 @@
+name: Scheduled Test Run
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Her gün saat 08:00'de çalışır
+  workflow_dispatch:  # Manuel tetikleme için
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+        
+    - name: Run Tests
+      run: mvn clean test
+        
+    - name: Generate Allure Report
+      if: always()
+      run: mvn allure:report
+      
+    - name: Store Test Results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: |
+          target/cucumber-reports
+          target/site/allure-maven-plugin
+          
+    - name: Send Mail
+      if: always()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: Test Execution Report - ${{ github.repository }}
+        body: |
+          Test execution completed.
+          Please find the test results attached.
+          
+          Repository: ${{ github.repository }}
+          Workflow: ${{ github.workflow }}
+          Run: ${{ github.run_id }}
+        to: ${{ secrets.RECIPIENT_EMAIL }}
+        from: GitHub Actions
+        attachments: |
+          target/cucumber-reports/**/*.html
+          target/site/allure-maven-plugin/**/*.html
