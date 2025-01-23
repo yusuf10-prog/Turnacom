@@ -90,6 +90,7 @@ public class TurnaSteps {
         System.out.println("\nTest completed, closing browser");
         if (driver != null) {
             driver.quit();
+
         }
         System.out.println("====== Test Finished ======\n");
     }
