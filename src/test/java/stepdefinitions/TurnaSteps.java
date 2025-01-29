@@ -77,6 +77,7 @@ public class TurnaSteps {
         turnaHomePage.clickCarRentalButton();
     }
 
+
     @Then("I click on the Ferry button")
     @Step("Clicking Ferry section")
     @Description("Navigate to the Ferry booking section")
