@@ -94,6 +94,7 @@ public class TurnaSteps {
             driver.quit();
 
         }
+
         System.out.println("====== Test Finished ======\n");
     }
 }
